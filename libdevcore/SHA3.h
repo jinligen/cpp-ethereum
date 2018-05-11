@@ -34,7 +34,7 @@ namespace dev
 
 /// Calculate SHA3-256 hash of the given input and load it into the given output.
 /// @returns false if o_output.size() != 32.
-bool sha3(bytesConstRef _input, bytesRef o_output);
+bool sha3(bytesConstRef _input, bytesRef o_output) noexcept;
 
 /// Calculate SHA3-256 hash of the given input, returning as a 256-bit hash.
 inline h256 sha3(bytesConstRef _input) { h256 ret; sha3(_input, ret.ref()); return ret; }
@@ -64,8 +64,8 @@ inline std::string sha3(std::string const& _input, bool _isNibbles) { return asS
 /// Calculate SHA3-256 MAC
 inline void sha3mac(bytesConstRef _secret, bytesConstRef _plain, bytesRef _output) { sha3(_secret.toBytes() + _plain.toBytes()).ref().populate(_output); }
 
-extern h256 EmptySHA3;
+extern const h256 EmptySHA3;
 
-extern h256 EmptyListSHA3;
+extern const h256 EmptyListSHA3;
 
 }

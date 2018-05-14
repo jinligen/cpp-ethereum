@@ -94,8 +94,31 @@ defaults:
     - *update-submodules
     - *environment-info
     - *restore-deps-cache
+    - restore_cache:
+        keys:
+          - ccache-1-{{arch}}-{{checksum "compiler.version"}}-{{.Branch}}
+          - ccache-1-{{arch}}-{{checksum "compiler.version"}}
+        paths:
+          - ~/.ccache
+    - run:
+        name: "ccache setup"
+        command: |
+          ccache --version
+          ccache --set-config=log_file=/home/builder/ccache.log
+          ccache --show-stats
+          ccache --zero-stats
+          ccache --max-size=1G
     - *configure
     - *build
+    - run:
+        name: "ccache stats"
+        command: |
+          ccache --show-stats
+          cat /home/builder/ccache.log
+    - save_cache:
+        key: ccache-1-{{arch}}-{{checksum "compiler.version"}}-{{.Branch}}-{{epoch}}
+        paths:
+          - ~/.ccache
     - *save-deps-cache
     - *store-package
     - *restore-ethash-dag
@@ -122,7 +145,7 @@ jobs:
       - BUILD_PARALLEL_JOBS: 8
       - TEST_PARALLEL_JOBS: 8
     docker:
-      - image: ethereum/cpp-build-env
+      - image: ethereum/cpp-build-env:1
     steps: *linux-steps
 
   linux-gcc6:
@@ -138,7 +161,7 @@ jobs:
       # - CMAKE_OPTIONS: -DSANITIZE=address
       # - ASAN_OPTIONS: detect_leaks=0
     docker:
-      - image: ethereum/cpp-build-env
+      - image: ethereum/cpp-build-env:1
     steps: *linux-steps
 
   macos-xcode90:
